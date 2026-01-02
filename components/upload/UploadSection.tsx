@@ -135,7 +135,7 @@ export function UploadSection() {
                                     <Button
                                         size="lg"
                                         onClick={handleUpload}
-                                        className="h-14 px-8 text-xl font-semibold bg-[#EF3024] hover:bg-[#d02015] text-white shadow-lg shadow-red-100 min-w-[200px]"
+                                        className="h-14 px-8 text-xl font-semibold bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 min-w-[200px] rounded-full"
                                     >
                                         Optimise Photos for Blocket
                                     </Button>
