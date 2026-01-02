@@ -19,10 +19,10 @@
 | Подзадача | Оценка | Статус |
 |-----------|--------|--------|
 | ✅ Next.js проект инициализирован | Done | ✅ |
-| [ ] Настройка Tailwind + shadcn/ui | 2h | [ ] |
-| [ ] Landing page: Hero + How it works | 4h | [ ] |
-| [ ] Responsive layout (mobile-first) | 2h | [ ] |
-| [ ] Footer + Terms/Privacy placeholder | 1h | [ ] |
+| ✅ Настройка Tailwind + shadcn/ui | 2h | ✅ |
+| ✅ Landing page: Hero + How it works | 4h | ✅ |
+| ✅ Responsive layout (mobile-first) | 2h | ✅ |
+| ✅ Footer + Terms/Privacy placeholder | 1h | ✅ |
 
 **Результат (Deliverable):** Лендинг доступен по ссылке на Vercel.
 
@@ -31,13 +31,13 @@
 
 | Подзадача | Оценка | Статус |
 |-----------|--------|--------|
-| [ ] `<UploadZone />` component | 3h | [ ] |
-| [ ] Drag&drop (desktop) | 2h | [ ] |
-| [ ] Camera/gallery picker (mobile) | 2h | [ ] |
-| [ ] Валидация файлов (тип, размер, кол-во) | 1h | [ ] |
-| [ ] Превью загруженных файлов | 2h | [ ] |
-| [ ] `/api/upload` endpoint | 2h | [ ] |
-| [ ] Интеграция с Vercel Blob | 2h | [ ] |
+| ✅ `<UploadZone />` component | 3h | ✅ |
+| ✅ Drag&drop (desktop) | 2h | ✅ |
+| ✅ Camera/gallery picker (mobile) | 2h | ✅ |
+| ✅ Валидация файлов (тип, размер, кол-во) | 1h | ✅ |
+| ✅ Превью загруженных файлов | 2h | ✅ |
+| ✅ `/api/upload` endpoint | 2h | ✅ |
+| ✅ Интеграция с Vercel Blob (Mocked) | 2h | ✅ |
 
 **Результат (Deliverable):** Пользователь может загрузить до 10 фото, они сохраняются в Blob storage.
 
