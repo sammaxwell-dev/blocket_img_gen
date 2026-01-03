@@ -7,60 +7,102 @@ if (!process.env.GOOGLE_API_KEY) {
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
 // Модели
-const IMAGE_MODEL = "gemini-3-pro-image-preview"; // Nano Banana Pro для генерации
-const ANALYSIS_MODEL = "gemini-2.5-flash"; // Быстрая модель для анализа
+const IMAGE_MODEL = "gemini-3-pro-image-preview";
+const ANALYSIS_MODEL = "gemini-2.5-flash";
 
-// Контексты для разных категорий товаров
-const CATEGORY_CONTEXTS: Record<string, Array<{ name: string; scene: string }>> = {
-    "electronics_computer": [
-        { name: "Gaming Setup", scene: "professional gaming desk with RGB lighting, gaming monitor, keyboard, mouse, evening atmosphere with colorful accent lights" },
-        { name: "Home Office", scene: "clean minimalist desk, natural daylight, plant decoration, Scandinavian-style aesthetic" },
-        { name: "Tech Studio", scene: "modern tech workspace, multiple monitors, professional lighting, sleek and futuristic" }
-    ],
-    "electronics_phone": [
-        { name: "Lifestyle", scene: "held in hand at a coffee shop, modern cafe background, natural lighting" },
-        { name: "Desk Shot", scene: "laying on a clean marble or wooden desk, minimal accessories, soft shadows" },
-        { name: "Tech Display", scene: "standing on a wireless charger, modern home interior background, ambient lighting" }
-    ],
-    "vehicle_car": [
-        { name: "Street Parking", scene: "parked on a clean city street, urban environment, good lighting, realistic setting" },
-        { name: "Scenic Drive", scene: "parked in a scenic location, nature or mountain backdrop, golden hour lighting" },
-        { name: "Showroom", scene: "in a professional car showroom or garage, polished floor, professional lighting" }
-    ],
-    "vehicle_motorcycle": [
-        { name: "Urban Street", scene: "parked on a city street, urban backdrop, evening lighting" },
-        { name: "Open Road", scene: "on a scenic highway or mountain road, adventure feeling" },
-        { name: "Garage", scene: "in a clean garage or workshop, professional display" }
+// Режимы обработки
+export type ProcessingMode = "angles" | "studio";
+
+// Описания режимов для UI
+export const PROCESSING_MODES = {
+    angles: {
+        name: "Pro Angles",
+        description: "Same background, but shot from professional camera angles with perfect lighting.",
+        icon: "📐"
+    },
+    studio: {
+        name: "Studio",
+        description: "Complete transformation with professional studio backgrounds.",
+        icon: "📸"
+    }
+} as const;
+
+// Профессиональные ракурсы — как в каталогах и e-commerce
+const PROFESSIONAL_ANGLES = [
+    {
+        name: "Hero Shot",
+        prompt: `CAMERA ANGLE: 3/4 front view, camera positioned 30 degrees to the left, slightly elevated at 15 degrees above the product
+
+PROFESSIONAL PHOTOGRAPHY STYLE:
+- Shallow depth of field (f/2.8) - product sharp, background softly blurred
+- Soft key light from the upper left creating gentle highlights
+- Fill light from the right to reduce harsh shadows
+- Subtle rim lighting from behind to separate product from background
+- Colors slightly enhanced for vibrancy
+- Professional product photography composition with the rule of thirds`
+    },
+    {
+        name: "Overhead Flat Lay",
+        prompt: `CAMERA ANGLE: Perfectly overhead, 90 degrees looking straight down (flat lay perspective)
+
+PROFESSIONAL PHOTOGRAPHY STYLE:
+- Even, diffused lighting from above (like a light tent)
+- No harsh shadows - soft shadows only for depth
+- High clarity and sharpness across entire product
+- Clean, balanced composition centered in frame
+- Color accurate with professional white balance
+- The kind of overhead shot you'd see in magazines or Instagram`
+    },
+    {
+        name: "Detail Beauty Shot",
+        prompt: `CAMERA ANGLE: Close-up macro perspective focusing on the most interesting detail, texture, or branding of the product
+
+PROFESSIONAL PHOTOGRAPHY STYLE:
+- Extremely shallow depth of field (f/1.8) - only key detail in focus
+- Beautiful bokeh in unfocused areas
+- Dramatic but soft directional lighting highlighting texture
+- High-end beauty product photography aesthetic
+- Professional focus stacking if needed for sharpness
+- The kind of detail shot that makes products look premium and luxurious`
+    }
+];
+
+// Studio контексты для разных категорий
+const STUDIO_CONTEXTS: Record<string, Array<{ name: string; scene: string }>> = {
+    "electronics": [
+        { name: "Tech Showcase", scene: "sleek dark surface with subtle gradient lighting, tech product photography style, dramatic rim lighting" },
+        { name: "Minimalist White", scene: "pure white infinity curve background, soft even lighting, Apple-style product photography" },
+        { name: "Premium Display", scene: "glossy black reflective surface, professional studio lighting with highlights" }
     ],
     "furniture": [
-        { name: "Living Room", scene: "in a stylish living room, coordinated decor, natural daylight" },
-        { name: "Showroom", scene: "in a furniture showroom, professional lighting, clean background" },
-        { name: "Cozy Home", scene: "in a warm, cozy home environment, evening lighting, comfortable atmosphere" }
+        { name: "Modern Interior", scene: "stylish Scandinavian living room, natural window light, interior design magazine style" },
+        { name: "Showroom", scene: "professional furniture showroom with perfect lighting, clean minimal background" },
+        { name: "Lifestyle", scene: "cozy home environment, warm evening lighting, inviting atmosphere" }
     ],
     "clothing": [
-        { name: "Fashion Shot", scene: "flat lay on a clean background, styled with accessories" },
-        { name: "Lifestyle", scene: "in a stylish room or outdoor setting, lifestyle context" },
-        { name: "Studio", scene: "on a mannequin or hanger, professional studio lighting, clean backdrop" }
-    ],
-    "sports_equipment": [
-        { name: "In Action", scene: "in appropriate sports environment (gym, field, court)" },
-        { name: "Clean Display", scene: "on a clean surface with related gear, professional lighting" },
-        { name: "Lifestyle", scene: "in a home gym or outdoor setting, active lifestyle context" }
-    ],
-    "home_appliance": [
-        { name: "Kitchen", scene: "in a modern kitchen, on countertop, natural lighting" },
-        { name: "Lifestyle", scene: "being used in a realistic home setting" },
-        { name: "Clean Display", scene: "on a clean surface, studio lighting, product focus" }
+        { name: "Fashion Editorial", scene: "high-end fashion photography backdrop, dramatic lighting, magazine quality" },
+        { name: "Clean Studio", scene: "pure white background, professional fashion photography lighting" },
+        { name: "Lifestyle Flat Lay", scene: "styled flat lay with complementary accessories, overhead professional lighting" }
     ],
     "default": [
-        { name: "Professional", scene: "on a clean surface with professional studio lighting, neutral background" },
-        { name: "Lifestyle", scene: "in a realistic home or office environment, natural lighting" },
-        { name: "Context Shot", scene: "in an appropriate setting for this type of product, showing it in use" }
+        { name: "Premium White", scene: "clean white infinity curve, soft professional lighting, e-commerce standard" },
+        { name: "Dark Elegant", scene: "dark gradient background with dramatic rim lighting, luxury product style" },
+        { name: "Natural Light", scene: "near a window with beautiful natural light, lifestyle product photography" }
     ]
 };
 
-// Анализ изображения для определения категории товара
-async function analyzeProductCategory(imageBuffer: Buffer): Promise<string> {
+interface ProcessingResult {
+    name: string;
+    imageUrl: string;
+}
+
+// Анализ изображения для понимания контекста
+async function analyzeImageContext(imageBuffer: Buffer): Promise<{
+    productDescription: string;
+    surfaceDescription: string;
+    lightingDescription: string;
+    category: string;
+}> {
     try {
         const imageBase64 = imageBuffer.toString("base64");
 
@@ -74,65 +116,77 @@ async function analyzeProductCategory(imageBuffer: Buffer): Promise<string> {
                     }
                 },
                 {
-                    text: `Analyze this product image and categorize it. Return ONLY one of these exact category codes:
+                    text: `Analyze this product photo. Return a JSON object:
+{
+  "productDescription": "Detailed description of the product",
+  "surfaceDescription": "Description of the surface/background",
+  "lightingDescription": "Current lighting conditions",
+  "category": "One of: electronics, furniture, clothing, default"
+}
 
-- electronics_computer (PC, laptop, monitor, keyboard, gaming gear)
-- electronics_phone (smartphone, tablet, smartwatch)
-- vehicle_car (car, SUV, truck)
-- vehicle_motorcycle (motorcycle, scooter, bike)
-- furniture (chair, table, sofa, bed, shelf)
-- clothing (clothes, shoes, bags, accessories)
-- sports_equipment (gym equipment, sports gear, outdoor gear)
-- home_appliance (kitchen appliances, home devices)
-- default (anything else)
-
-Return ONLY the category code, nothing else.`
+Return ONLY the JSON, no other text.`
                 }
             ]
         });
 
-        const category = response.text?.trim().toLowerCase() || "default";
-        console.log(`Product category detected: ${category}`);
-
-        // Validate category exists
-        if (CATEGORY_CONTEXTS[category]) {
-            return category;
+        const text = response.text?.trim() || "{}";
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            return {
+                productDescription: parsed.productDescription || "a product",
+                surfaceDescription: parsed.surfaceDescription || "a surface",
+                lightingDescription: parsed.lightingDescription || "ambient lighting",
+                category: parsed.category || "default"
+            };
         }
-        return "default";
+
+        return {
+            productDescription: "a product",
+            surfaceDescription: "a surface",
+            lightingDescription: "ambient lighting",
+            category: "default"
+        };
     } catch (error) {
-        console.error("Category analysis error:", error);
-        return "default";
+        console.error("Context analysis error:", error);
+        return {
+            productDescription: "a product",
+            surfaceDescription: "a surface",
+            lightingDescription: "ambient lighting",
+            category: "default"
+        };
     }
 }
 
-interface ProcessingResult {
-    name: string;
-    imageUrl: string;
-}
-
-// Генерация одного изображения в контексте
-async function generateInContext(
+// Генерация профессионального ракурса (режим Angles)
+async function generateProfessionalAngle(
     imageBuffer: Buffer,
-    contextName: string,
-    sceneDescription: string
+    angleConfig: typeof PROFESSIONAL_ANGLES[0],
+    context: { productDescription: string; surfaceDescription: string }
 ): Promise<ProcessingResult | null> {
     try {
         const imageBase64 = imageBuffer.toString("base64");
 
-        const prompt = `Using the provided product image as reference, place this EXACT product into a new scene.
+        const prompt = `You are an elite commercial product photographer creating images for a high-end e-commerce catalog.
 
-NEW SCENE: ${sceneDescription}
+PRODUCT: ${context.productDescription}
+ORIGINAL SURFACE TO KEEP: ${context.surfaceDescription}
 
-CRITICAL REQUIREMENTS:
-1. The product must look EXACTLY like in the reference - same model, colors, details, branding
-2. Only change the environment/background around the product
-3. Make it look like a professional product photo for e-commerce
-4. The scene should look realistic and natural
-5. High quality, professional photography lighting
+${angleConfig.prompt}
 
-Generate the image now.`;
+ABSOLUTE REQUIREMENTS:
+1. The product must be IDENTICAL to the reference - exact same item, colors, details, logos
+2. KEEP the original surface/background from the photo - same table, same setting
+3. Transform ONLY the camera angle and lighting to be professional quality
+4. The result must look like it was shot by a professional photographer with $5000 camera equipment
+5. Apply professional color grading - slightly enhanced but natural
+6. The lighting should be dramatically improved - soft, professional, flattering
+7. This should look like a photo from a professional product catalog, NOT an amateur snapshot
+8. Add subtle professional touches: perfect exposure, ideal white balance, professional composition
 
-        console.log(`Generating: ${contextName}...`);
+Generate this professional product photograph now.`;
+
+        console.log(`Generating: ${angleConfig.name}...`);
 
         const response = await ai.models.generateContent({
             model: IMAGE_MODEL,
@@ -151,15 +205,15 @@ Generate the image now.`;
         });
 
         if (!response.candidates?.[0]?.content?.parts) {
-            console.error(`No response for ${contextName}`);
+            console.error(`No response for ${angleConfig.name}`);
             return null;
         }
 
         for (const part of response.candidates[0].content.parts) {
             if (part.inlineData) {
-                console.log(`✓ Generated: ${contextName}`);
+                console.log(`✓ Generated: ${angleConfig.name}`);
                 return {
-                    name: contextName,
+                    name: angleConfig.name,
                     imageUrl: `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`
                 };
             }
@@ -167,50 +221,136 @@ Generate the image now.`;
 
         return null;
     } catch (error: any) {
-        console.error(`Error generating ${contextName}:`, error.message || error);
+        console.error(`Error generating ${angleConfig.name}:`, error.message || error);
         return null;
     }
 }
 
-// Основная функция
-export const processImageWithVariations = async (imageBuffer: Buffer): Promise<{
+// Генерация студийного фото (режим Studio)
+async function generateStudioShot(
+    imageBuffer: Buffer,
+    sceneName: string,
+    sceneDescription: string,
+    productDescription: string
+): Promise<ProcessingResult | null> {
+    try {
+        const imageBase64 = imageBuffer.toString("base64");
+
+        const prompt = `You are an elite commercial product photographer creating images for a luxury brand catalog.
+
+PRODUCT TO PHOTOGRAPH: ${productDescription}
+
+NEW PROFESSIONAL STUDIO SETTING: ${sceneDescription}
+
+REQUIREMENTS:
+1. The product must be IDENTICAL to the reference - exact same item, every detail preserved
+2. Place the product in a completely new, professional studio environment
+3. Use professional studio lighting techniques:
+   - Key light, fill light, and rim/back light
+   - Soft shadows, no harsh dark areas
+   - Professional catchlights and highlights
+4. The composition should follow product photography best practices
+5. This must look like a $500/shot professional product photograph
+6. High-end retouching quality - perfect exposure, color, and sharpness
+7. The background should complement the product, not distract from it
+
+Generate this professional studio product photograph now.`;
+
+        console.log(`Generating: Studio - ${sceneName}...`);
+
+        const response = await ai.models.generateContent({
+            model: IMAGE_MODEL,
+            contents: [
+                {
+                    inlineData: {
+                        mimeType: "image/jpeg",
+                        data: imageBase64
+                    }
+                },
+                { text: prompt }
+            ],
+            config: {
+                responseModalities: ["Text", "Image"]
+            }
+        });
+
+        if (!response.candidates?.[0]?.content?.parts) {
+            console.error(`No response for Studio - ${sceneName}`);
+            return null;
+        }
+
+        for (const part of response.candidates[0].content.parts) {
+            if (part.inlineData) {
+                console.log(`✓ Generated: Studio - ${sceneName}`);
+                return {
+                    name: sceneName,
+                    imageUrl: `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`
+                };
+            }
+        }
+
+        return null;
+    } catch (error: any) {
+        console.error(`Error generating Studio - ${sceneName}:`, error.message || error);
+        return null;
+    }
+}
+
+// Основная функция обработки
+export const processImageWithVariations = async (
+    imageBuffer: Buffer,
+    mode: ProcessingMode = "angles"
+): Promise<{
     original: string;
     variations: ProcessingResult[];
-    category: string;
+    mode: ProcessingMode;
 }> => {
-    console.log("------- SMART CONTEXT GENERATION START -------");
+    console.log(`------- PROCESSING START (Mode: ${mode}) -------`);
 
-    // 1. Определяем категорию товара
-    const category = await analyzeProductCategory(imageBuffer);
-    const contexts = CATEGORY_CONTEXTS[category] || CATEGORY_CONTEXTS["default"];
+    // Анализируем контекст изображения
+    const context = await analyzeImageContext(imageBuffer);
+    console.log("Product:", context.productDescription.substring(0, 60) + "...");
 
-    console.log(`Using contexts for: ${category}`);
-    console.log(`Generating ${contexts.length} variations...`);
-
-    // 2. Конвертируем оригинал в base64
     const originalBase64 = `data:image/jpeg;base64,${imageBuffer.toString("base64")}`;
+    const variations: ProcessingResult[] = [];
 
-    // 3. Генерируем все вариации параллельно
-    const results = await Promise.all(
-        contexts.map(ctx => generateInContext(imageBuffer, ctx.name, ctx.scene))
-    );
+    if (mode === "angles") {
+        // Режим Pro Angles — профессиональные ракурсы с тем же фоном
+        const results = await Promise.all(
+            PROFESSIONAL_ANGLES.map(angle =>
+                generateProfessionalAngle(imageBuffer, angle, {
+                    productDescription: context.productDescription,
+                    surfaceDescription: context.surfaceDescription
+                })
+            )
+        );
+        variations.push(...results.filter((r): r is ProcessingResult => r !== null));
 
-    // 4. Фильтруем успешные результаты
-    const variations = results.filter((r): r is ProcessingResult => r !== null);
+    } else {
+        // Режим Studio — полная замена фона на профессиональную студию
+        const contexts = STUDIO_CONTEXTS[context.category] || STUDIO_CONTEXTS["default"];
 
-    console.log(`Generated ${variations.length}/${contexts.length} variations successfully`);
-    console.log("------- SMART CONTEXT GENERATION END -------");
+        const results = await Promise.all(
+            contexts.map(ctx =>
+                generateStudioShot(imageBuffer, ctx.name, ctx.scene, context.productDescription)
+            )
+        );
+        variations.push(...results.filter((r): r is ProcessingResult => r !== null));
+    }
+
+    console.log(`Generated ${variations.length} variations successfully`);
+    console.log("------- PROCESSING END -------");
 
     return {
         original: originalBase64,
         variations,
-        category
+        mode
     };
 };
 
 // Для обратной совместимости
 export const processImageWithGemini = async (imageBuffer: Buffer): Promise<string> => {
-    const result = await processImageWithVariations(imageBuffer);
+    const result = await processImageWithVariations(imageBuffer, "angles");
     if (result.variations.length > 0) {
         return result.variations[0].imageUrl;
     }

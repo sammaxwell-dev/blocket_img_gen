@@ -1,19 +1,21 @@
-import { Header } from "@/components/layout/Header";
 import { Hero } from "@/components/landing/Hero";
 import { Features } from "@/components/landing/Features";
-import { HowItWorks } from "@/components/landing/HowItWorks";
 import { Footer } from "@/components/layout/Footer";
 import { UploadSection } from "@/components/upload/UploadSection";
+import { Testimonials } from "@/components/landing/Testimonials";
+import { FAQ } from "@/components/landing/FAQ";
 
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col font-sans bg-white">
-      <Header />
       <main className="flex-1">
         <Hero />
-        <Features />
+        <div id="features">
+          <Features />
+        </div>
         <UploadSection />
-        <HowItWorks />
+        <Testimonials />
+        <FAQ />
       </main>
       <Footer />
     </div>

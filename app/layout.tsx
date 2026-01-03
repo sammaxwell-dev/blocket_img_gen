@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Navbar } from "@/components/layout/Navbar";
+import { Providers } from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Blocket Photo - AI Photo Optimizer for Blocket & Tradera",
-  description: "Transform your product photos with AI. Remove backgrounds, enhance lighting, and get Blocket-ready images in seconds.",
+  title: "SnapturaAI - Professional AI Photo Editor for Marketplace Sellers",
+  description: "Transform your product photos with AI. Remove backgrounds, enhance lighting, and get marketplace-ready images in seconds.",
 };
 
 export default function RootLayout({
@@ -24,10 +26,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <Providers>
+          <div className="bg-noise" />
+          <Navbar />
+          {children}
+        </Providers>
       </body>
     </html>
   );
