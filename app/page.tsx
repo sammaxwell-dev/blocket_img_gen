@@ -1,5 +1,6 @@
 import { Header } from "@/components/layout/Header";
 import { Hero } from "@/components/landing/Hero";
+import { Features } from "@/components/landing/Features";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { Footer } from "@/components/layout/Footer";
 import { UploadSection } from "@/components/upload/UploadSection";
@@ -10,6 +11,7 @@ export default function Home() {
       <Header />
       <main className="flex-1">
         <Hero />
+        <Features />
         <UploadSection />
         <HowItWorks />
       </main>

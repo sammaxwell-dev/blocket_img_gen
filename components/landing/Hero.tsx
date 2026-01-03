@@ -2,93 +2,88 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Check } from "lucide-react";
-import { PhoneMockup } from "./PhoneMockup";
-import { FeatureBadge } from "./FeatureBadge";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { CompareSlider } from "./CompareSlider";
 
 export function Hero() {
     return (
         <section className="relative overflow-hidden pt-28 pb-16 md:pt-36 md:pb-24 bg-[#FAFAFA]">
             <div className="container px-4 md:px-6 mx-auto">
-                <div className="grid lg:grid-cols-2 gap-16 lg:gap-8 items-center">
+                <div className="grid lg:grid-cols-2 gap-16 lg:gap-12 items-center">
                     {/* Left column - Text content */}
                     <div className="space-y-8 max-w-xl relative z-10">
 
-                        <div className="space-y-4">
-                            {/* Eyebrow text similar to "Organize your skincare routine..." */}
-                            <p className="text-gray-500 text-lg">
-                                Take perfectly lit photos with your phone
-                                <br />
-                                and sell faster. <span className="text-primary font-medium">Easily.</span>
-                            </p>
+                        <div className="space-y-6">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                                <Sparkles size={16} />
+                                <span>AI Photo Editor for Sellers</span>
+                            </div>
 
-                            {/* Main heading - Bold, tighter tracking */}
-                            <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl md:text-7xl text-gray-950 leading-[1.1]">
-                                Sell on Blocket{" "}
-                                <br />
-                                <span className="relative inline-block">
-                                    faster with AI
-                                    {/* Underline decoration */}
-                                    <svg className="absolute -bottom-2 left-0 w-full h-3 text-primary" viewBox="0 0 100 10" preserveAspectRatio="none">
-                                        <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.8" />
-                                    </svg>
-                                </span>
+                            <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl text-gray-950 leading-[1.1]">
+                                Turn Phone Photos into{" "}
+                                <span className="text-primary">Studio Quality</span>
                             </h1>
+
+                            <p className="text-gray-600 text-lg md:text-xl leading-relaxed">
+                                Don't let bad photos kill your sales. Our AI automatically removes backgrounds, fixes lighting, and makes your items pop on Blocket & Tradera.
+                            </p>
                         </div>
 
-                        {/* Social proof box matching reference */}
-                        <div className="inline-flex items-center gap-4 p-4 pr-6 bg-white border border-gray-100 rounded-2xl shadow-sm">
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <Button size="lg" className="rounded-full text-base h-12 px-8 shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90 text-white">
+                                Enhance Photos Now <ArrowRight className="ml-2 w-4 h-4" />
+                            </Button>
+                            <Button variant="outline" size="lg" className="rounded-full text-base h-12 px-8 bg-white/50 backdrop-blur-sm">
+                                View Examples
+                            </Button>
+                        </div>
+
+                        {/* Social proof */}
+                        <div className="flex items-center gap-4 pt-4">
                             <div className="flex -space-x-3">
                                 {[1, 2, 3, 4].map((i) => (
                                     <div
                                         key={i}
-                                        className="w-10 h-10 rounded-full bg-gray-200 border-2 border-white overflow-hidden relative"
+                                        className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white overflow-hidden relative"
                                     >
-                                        {/* Placeholder avatars */}
                                         <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-300" />
                                     </div>
                                 ))}
                             </div>
-                            <div className="text-sm">
-                                <p className="font-semibold text-gray-900">Trusted by 500+ sellers</p>
-                                <p className="text-gray-500 text-xs">on Blocket & Tradera</p>
-                            </div>
+                            <p className="text-sm text-gray-600">
+                                Used by <span className="font-semibold text-gray-900">500+ sellers</span> today
+                            </p>
                         </div>
                     </div>
 
-                    {/* Right column - Phone mockup with badges */}
-                    <div className="relative flex justify-center lg:justify-end">
-                        {/* Decorative background glow behind phone */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 blur-[100px] rounded-full -z-10" />
+                    {/* Right column - Before/After Comparison */}
+                    <div className="relative">
+                        {/* Decorative elements */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-primary/10 via-purple-500/5 to-blue-500/10 blur-[60px] rounded-full -z-10" />
 
-                        <div className="relative z-10 scale-[0.85] sm:scale-100 transform translate-x-4">
-                            <PhoneMockup />
+                        <div className="relative z-10 transform transition-transform hover:scale-[1.01] duration-500">
+                            <CompareSlider
+                                beforeImage="/hero-before.png"
+                                afterImage="/hero-after.png"
+                                beforeLabel="Phone Photo"
+                                afterLabel="AI Studio"
+                                className="shadow-2xl shadow-gray-200/50 rotate-1 border-[6px]"
+                            />
 
-                            {/* Feature badges positioned exactly like markers */}
+                            {/* Floating badges */}
+                            <div className="absolute -left-6 top-12 bg-white p-3 rounded-xl shadow-lg border border-gray-100 animate-in fade-in slide-in-from-left-4 duration-700 delay-300">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                    <span className="text-xs font-semibold text-gray-700">Auto-Lighting</span>
+                                </div>
+                            </div>
 
-                            {/* "Compatibility Checker" equivalent */}
-                            <FeatureBadge
-                                position="left"
-                                className="absolute top-24 -left-12 md:-left-28"
-                            >
-                                Studio Lighting
-                            </FeatureBadge>
-
-                            {/* "AI Skin Analysis" equivalent - bottom left */}
-                            <FeatureBadge
-                                position="left"
-                                className="absolute bottom-32 -left-8 md:-left-24"
-                            >
-                                Background Removal
-                            </FeatureBadge>
-
-                            {/* "Routine Builder" equivalent - middle right */}
-                            <FeatureBadge
-                                position="right"
-                                className="absolute top-1/2 -right-4 md:-right-20 translate-y-12"
-                            >
-                                Blocket Ready
-                            </FeatureBadge>
+                            <div className="absolute -right-6 bottom-12 bg-white p-3 rounded-xl shadow-lg border border-gray-100 animate-in fade-in slide-in-from-right-4 duration-700 delay-500">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                                    <span className="text-xs font-semibold text-gray-700">Background Removed</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -96,3 +91,4 @@ export function Hero() {
         </section>
     );
 }
+
