@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SellMore | Make Your Items Worth More</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              alabaster: '#F9F9F7',
+              charcoal: '#1A1A1A',
+              'intl-orange': '#FF4F00',
+              'sage-green': '#8A9A5B',
+            },
+            fontFamily: {
+              sans: ['"Space Grotesk"', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'monospace'],
+            },
+            cursor: {
+              none: 'none',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #F9F9F7;
+        color: #1A1A1A;
+        cursor: none; /* Hide default cursor for custom one */
+      }
+      
+      /* Grain Texture */
+      .bg-grain {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 50;
+        opacity: 0.05;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      }
+
+      /* Custom Cursor */
+      .custom-cursor {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 20px;
+        height: 20px;
+        background-color: #1A1A1A;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        transform: translate(-50%, -50%);
+        mix-blend-mode: difference;
+        transition: width 0.2s, height 0.2s, background-color 0.2s;
+      }
+      
+      .custom-cursor.hovered {
+        width: 60px;
+        height: 60px;
+        background-color: #FF4F00;
+        opacity: 0.8;
+        mix-blend-mode: normal;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .custom-cursor.hovered::after {
+        content: attr(data-text);
+        color: white;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        font-weight: bold;
+      }
+
+      /* Scrollbar Hide */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <div class="bg-grain"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
